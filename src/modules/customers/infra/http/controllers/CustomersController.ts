@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import CreateCustomerService from '../../../services/CreateCustomerService';
 import DeleteCustomerService from '../../../services/DeleteCustomerService';
 import ListCustomerService from '../../../services/ListCustomerService';
@@ -7,9 +8,11 @@ import UpdateCustomerService from '../../../services/UpdateCustomerService';
 
 export default class CustomersController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const listCustomers = new ListCustomerService();
+    const page = request.query.page ? Number(request.query.page) : 1;
+    const limit = request.query.limit ? Number(request.query.limit) : 15;
 
-    const customers = await listCustomers.execute();
+    const listCustomers = container.resolve(ListCustomerService);
+    const customers = await listCustomers.execute({ page, limit });
 
     return response.json(customers);
   }
@@ -27,7 +30,7 @@ export default class CustomersController {
   public async create(request: Request, response: Response): Promise<Response> {
     const { name, email } = request.body;
 
-    const createCustomer = new CreateCustomerService();
+    const createCustomer = container.resolve(CreateCustomerService);
 
     const customer = await createCustomer.execute({
       name,
@@ -55,7 +58,7 @@ export default class CustomersController {
   public async delete(request: Request, response: Response): Promise<Response> {
     const { id } = request.params;
 
-    const deleteCustomer = new DeleteCustomerService();
+    const deleteCustomer = container.resolve(DeleteCustomerService);
 
     await deleteCustomer.execute({ id });
 
