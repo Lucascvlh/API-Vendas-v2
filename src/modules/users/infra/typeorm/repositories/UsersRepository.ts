@@ -1,4 +1,5 @@
 import { ICreateUsers } from '@modules/users/domain/models/ICreateUsers';
+import { IUser } from '@modules/users/domain/models/IUser';
 import { IUserRepository } from '@modules/users/domain/repositories/IUserRepository';
 import { getRepository, Repository } from 'typeorm';
 import User from '../entities/User';
@@ -41,6 +42,16 @@ class UsersRepository implements IUserRepository {
     await this.ormRepository.save(user);
 
     return user;
+  }
+
+  public async save(user: User): Promise<User> {
+    await this.ormRepository.save(user);
+
+    return user;
+  }
+
+  public async remove(user: User): Promise<void> {
+    await this.ormRepository.remove(user);
   }
 }
 
