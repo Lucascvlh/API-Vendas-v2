@@ -1,5 +1,4 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -17,9 +16,6 @@ import { IOrder } from '@modules/orders/domain/models/IOrder';
 class Order implements IOrder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column('int')
-  order: number;
 
   @ManyToOne(() => Customer)
   @JoinColumn({ name: 'customer_id' })
