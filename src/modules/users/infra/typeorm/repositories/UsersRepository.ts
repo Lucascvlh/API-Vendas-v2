@@ -1,39 +1,20 @@
 import { ICreateUsers } from '@modules/users/domain/models/ICreateUsers';
-import { IUser } from '@modules/users/domain/models/IUser';
-import { IUserRepository } from '@modules/users/domain/repositories/IUserRepository';
+import { IPaginateUser } from '@modules/users/domain/models/IPaginateUser';
+import { IUsersRepository } from '@modules/users/domain/repositories/IUsersRepository';
 import { getRepository, Repository } from 'typeorm';
 import User from '../entities/User';
 
-class UsersRepository implements IUserRepository {
+type SearchParams = {
+  page: number;
+  skip: number;
+  take: number;
+};
+
+class UsersRepository implements IUsersRepository {
   private ormRepository: Repository<User>;
+
   constructor() {
     this.ormRepository = getRepository(User);
-  }
-  public async findByName(name: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      where: {
-        name,
-      },
-    });
-    return user;
-  }
-
-  public async findById(id: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      where: {
-        id,
-      },
-    });
-    return user;
-  }
-
-  public async findByEmail(email: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      where: {
-        email,
-      },
-    });
-    return user;
   }
 
   public async create({ name, email, password }: ICreateUsers): Promise<User> {
@@ -50,8 +31,49 @@ class UsersRepository implements IUserRepository {
     return user;
   }
 
-  public async remove(user: User): Promise<void> {
-    await this.ormRepository.remove(user);
+  public async findAll({
+    page,
+    skip,
+    take,
+  }: SearchParams): Promise<IPaginateUser> {
+    const [users, count] = await this.ormRepository
+      .createQueryBuilder()
+      .skip(skip)
+      .take(take)
+      .getManyAndCount();
+
+    const result = {
+      per_page: take,
+      total: count,
+      current_page: page,
+      data: users,
+    };
+
+    return result;
+  }
+
+  public async findByName(name: string): Promise<User | undefined> {
+    const user = await this.ormRepository.findOne({
+      name,
+    });
+
+    return user;
+  }
+
+  public async findById(id: string): Promise<User | undefined> {
+    const user = await this.ormRepository.findOne({
+      id,
+    });
+
+    return user;
+  }
+
+  public async findByEmail(email: string): Promise<User | undefined> {
+    const user = await this.ormRepository.findOne({
+      email,
+    });
+
+    return user;
   }
 }
 

@@ -1,5 +1,3 @@
-/*Criação das colunas no banco de dados*/
-
 import OrdersProducts from '@modules/orders/infra/typeorm/entities/OrdersProducts';
 import {
   Column,
