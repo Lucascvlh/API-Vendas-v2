@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IUsersRepository } from '@modules/users/domain/repositories/IUsersRepository';
 import User from '@modules/users/infra/typeorm/entities/User';
 import { ICreateUsers } from '../../models/ICreateUsers';
+import { IUser } from '../../models/IUser';
 
 class FakeUsersRepository implements IUsersRepository {
   private users: User[] = [];
@@ -31,8 +32,12 @@ class FakeUsersRepository implements IUsersRepository {
     return undefined;
   }
 
-  public async findAll(): Promise<User[]> {
-    return this.users;
+  public async findAll(user: IUser): Promise<User | undefined> {
+    const findIndex = this.users.findIndex(findUser => findUser.id === user.id);
+
+    this.users[findIndex] = user;
+
+    return user;
   }
 
   public async findByName(name: string): Promise<User | undefined> {
